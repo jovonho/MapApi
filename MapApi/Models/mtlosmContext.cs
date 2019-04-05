@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using System.Threading.Tasks;
 
 namespace MapApi.Models
 {
@@ -15,7 +18,7 @@ namespace MapApi.Models
         {
         }
 
-        public virtual DbSet<Amenities> Amenities { get; set; }
+        public virtual DbSet<Amenity> Amenities { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -27,7 +30,7 @@ namespace MapApi.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Amenities>(entity =>
+            modelBuilder.Entity<Amenity>(entity =>
             {
                 entity.ToTable("amenities");
 
@@ -35,7 +38,7 @@ namespace MapApi.Models
                     .HasColumnName("id")
                     .HasColumnType("bigint(13)");
 
-                entity.Property(e => e.Amenity)
+                entity.Property(e => e.Type)
                     .HasColumnName("amenity")
                     .HasColumnType("text");
 
@@ -55,6 +58,21 @@ namespace MapApi.Models
                     .HasColumnName("pt")
                     .HasColumnType("point");
             });
+        }
+
+        public async Task<List<AmenityWithPoint>> getAmenitiesWithPoint()
+        {
+            var amenities_list = await Amenities.ToListAsync();
+            var awithpoint_list = new List<AmenityWithPoint>();
+
+            foreach (Amenity a in amenities_list)
+            {
+                awithpoint_list.Add(new AmenityWithPoint(a));
+            }
+
+            return awithpoint_list;
+
+
         }
     }
 }
